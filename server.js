@@ -1,9 +1,10 @@
-// require.paths.unshift('.');
+require.paths.unshift('.');
 var http = require('http'),
     io = require('socket.io'),
-    static = require('node-static');
+    static = require('node-static'),
+    application = require('application');
 
-// var app = new application.App()
+var app = new application.App()
 
 var fileServer = new static.Server('./public');
 
@@ -13,30 +14,6 @@ var server = http.createServer(function (req, res) {
   });
 });
 server.listen(3000);
-
-var app = {
-  init: function () {
-    this.count = 0
-    this.players = []
-  },
-  addPlayer: function (socketClient) {
-    var i = this.count++
-    var newPlayer = { socketClient: socketClient, cursorPosition: { x: 0, y: 0 }}
-    this.players[i] = newPlayer
-    newPlayer.updatePosition = function (newPosition) {
-      this.cursorPosition.x = newPosition.x
-      this.cursorPosition.y = newPosition.y
-      console.log("player: " + i + " ", this.cursorPosition)
-    }
-    newPlayer.destroy = function () {
-      app.players.splice(i, 1)
-      console.log("player: " + i + " destroyed")
-    }
-    return newPlayer
-  }
-};
-
-app.init();
 
 var socket = io.listen(server);
 socket.on('connection', function (socketClient) {
@@ -50,3 +27,7 @@ socket.on('connection', function (socketClient) {
     player.destroy()
   })
 });
+
+app.bind("playerMove", function () {
+  socket.broadcast({ positions: app.getPlayersPositions() })
+})

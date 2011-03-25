@@ -4,7 +4,7 @@ socket.on('connect', function () {
   // socket.send("dupa");
 }); 
 socket.on('message', function (msg) {
-  alert(msg);
+  console.log(msg);
 }); 
 var node_send = function(msg){
 	socket.send(msg);
