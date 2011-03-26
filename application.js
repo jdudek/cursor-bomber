@@ -95,4 +95,4 @@ var Bomb = function (app, index, position) {
 }
 Bomb.SIZE_STEP = 1
 Bomb.STEP_TIMEOUT = 100
-Bomb.MAX_SIZE = 100
+Bomb.MAX_SIZE = 30
