@@ -20,21 +20,21 @@ socket.on('connection', function (socketClient) {
   var player = app.addPlayer(socketClient)
   socketClient.on('message', function (msg) {
     if (typeof msg.cursorPosition != "undefined") {
-      player.updatePosition(msg.cursorPosition)
+      player.updatePosition(msg.cursorPosition);
     }
     if (typeof msg.setBomb != "undefined") {
-      app.setBomb(msg.setBomb)
+      app.setBomb(msg.setBomb);
     }
-  })
+  });
   socketClient.on("disconnect", function () {
-    player.destroy()
-  })
+    player.destroy();
+  });
 });
 
 app.bind("playerMoved", function () {
-  socket.broadcast({ positions: app.getPlayersPositions() })
-})
+  socket.broadcast({ positions: app.getPlayersPositions() });
+});
 
 app.bind(["bombCreated", "bombUpdated", "bombDestroyed"], function () {
-  socket.broadcast({ bombs: app.getBombs() })
-})
+  socket.broadcast({ bombs: app.getBombs() });
+});
