@@ -13,8 +13,8 @@ function redraw(){
 	context.fillStyle = "rgb(255,255,255)";
 	context.fillRect(0,0,canvas.width,canvas.height);
 	//draw players
-	context.fillStyle = "rgb(50,150,0)";
 	players.forEach(function(player){
+		context.fillStyle = player.color;
 		context.fillRect(player.x-10,player.y-10,20,20);
 	});
 	//draw bombs

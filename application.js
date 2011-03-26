@@ -2,6 +2,7 @@ exports.App = function () {
   var self = this
   var players = []
   var bombs = []
+	var colorSequence = new ColorSequence()
 
   self.bind = function (names, fn) {
     if (!Array.isArray(names)) {
@@ -21,7 +22,7 @@ exports.App = function () {
   }
   self.addPlayer = function (socketClient) {
     var index = players.length
-    players[index] = new Player(self, index, socketClient)
+    players[index] = new Player(self, index, socketClient, colorSequence.getNextColor())
     return players[index]
   }
   self.destroyPlayer = function (index) {
@@ -30,7 +31,7 @@ exports.App = function () {
   self.getPlayersPositions = function () {
     var ret = []
     for (i in players) {
-      ret.push(players[i].getPosition())
+      ret.push(players[i].serialize())
     }
     return ret
   }
@@ -49,21 +50,21 @@ exports.App = function () {
   }
 };
 
-var Player = function (app, index, socketClient) {
+var Player = function (app, index, socketClient, color) {
   var self = this
-  var cursorPosition = { x: 0, y: 0 }
+  var position = { x: 0, y: 0 }
 
   self.updatePosition = function (newPosition) {
-    cursorPosition.x = newPosition.x
-    cursorPosition.y = newPosition.y
-    console.log("player: " + index + " ", cursorPosition)
+    position.x = newPosition.x
+    position.y = newPosition.y
+    console.log("player: " + index + " ", position)
     app.trigger("playerMoved")
   }
   self.destroy = function () {
     app.destroyPlayer(index)
   }
-  self.getPosition = function () {
-    return cursorPosition
+  self.serialize = function () {
+    return {x: position.x, y: position.y, color: color}
   }
 }
 
@@ -95,3 +96,14 @@ var Bomb = function (app, index, position) {
 Bomb.SIZE_STEP = 1
 Bomb.STEP_TIMEOUT = 100
 Bomb.MAX_SIZE = 100
+
+var ColorSequence = function() {
+	var lastColor = 10
+ 	this.getNextColor = function () {
+		lastColor += 96
+		if(lastColor>255){
+			lastColor -= 248
+		}
+		return "hsl("+lastColor+", 100%, 50%)"
+	}	
+}
