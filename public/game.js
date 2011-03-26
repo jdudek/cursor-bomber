@@ -20,8 +20,8 @@ function redraw(){
 		context.fillRect(nX,nY,bomb[2],bomb[2]);
 	}
 	context.fillStyle = "rgb(50,150,0)";
-	players.foreach(function(player){
-		context.fillRect(x,y,20,20);
+	players.forEach(function(player){
+		context.fillRect(player.x,player.y,20,20);
 	});
 	var t = setTimeout(redraw, 40);
 }
