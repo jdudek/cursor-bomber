@@ -7,6 +7,9 @@ socket.on('message', function (msg) {
 	if(msg.positions) {
 		players = msg.positions;
 	}
+	if(msg.bombs) {
+		bombs = msg.bombs;
+	}
 }  
 ); 
 var node_send = function(msg){
