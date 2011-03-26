@@ -1,16 +1,23 @@
 exports.App = function () {
   var self = this
   var players = []
+  var bombs = []
 
-  self.bind = function (name, fn) {
+  self.bind = function (names, fn) {
+    if (!Array.isArray(names)) {
+      names = [names]
+    }
     self.boundEvents = self.boundEvents || {}
-    self.boundEvents[name] = self.boundEvents[name] || []
-    self.boundEvents[name].push(fn)
+    names.forEach(function (name) {
+      self.boundEvents[name] = self.boundEvents[name] || []
+      self.boundEvents[name].push(fn)
+    })
   }
   self.trigger = function (name) {
     if (self.boundEvents[name]) {
       self.boundEvents[name].forEach(function (fn) { fn() })
     }
+    console.log(name)
   }
   self.addPlayer = function (socketClient) {
     var index = players.length
@@ -19,7 +26,6 @@ exports.App = function () {
   }
   self.destroyPlayer = function (index) {
     players.splice(index, 1)
-    console.log("player: " + index + " destroyed")
   }
   self.getPlayersPositions = function () {
     var ret = []
@@ -27,6 +33,19 @@ exports.App = function () {
       ret.push(players[i].getPosition())
     }
     return ret
+  }
+  self.getBombs = function () {
+    return bombs.map(function (bomb) {
+      return { x: bomb.x, y: bomb.y, size: bomb.size }
+    })
+  }
+  self.setBomb = function (position) {
+    var index = bombs.length
+    bombs[index] = new Bomb(self, index, position)
+    return bombs[index]
+  }
+  self.destroyBomb = function (index) {
+    bombs.splice(index, 1)
   }
 };
 
@@ -38,7 +57,7 @@ var Player = function (app, index, socketClient) {
     cursorPosition.x = newPosition.x
     cursorPosition.y = newPosition.y
     console.log("player: " + index + " ", cursorPosition)
-    app.trigger("playerMove")
+    app.trigger("playerMoved")
   }
   self.destroy = function () {
     app.destroyPlayer(index)
@@ -47,3 +66,32 @@ var Player = function (app, index, socketClient) {
     return cursorPosition
   }
 }
+
+var Bomb = function (app, index, position) {
+  var self = this
+
+  self.x = position.x
+  self.y = position.y
+  self.size = 0
+
+  app.trigger("bombCreated")
+
+  setTimeout(function update () {
+    self.size += Bomb.SIZE_STEP
+    app.trigger("bombUpdated")
+
+    if (self.size > Bomb.MAX_SIZE) {
+      self.destroy()
+    } else {
+      setTimeout(update, Bomb.STEP_TIMEOUT)
+    }
+  }, Bomb.STEP_TIMEOUT)
+
+  self.destroy = function () {
+    app.destroyBomb(index)
+    app.trigger("bombDestroyed")
+  }
+}
+Bomb.SIZE_STEP = 1
+Bomb.STEP_TIMEOUT = 100
+Bomb.MAX_SIZE = 100

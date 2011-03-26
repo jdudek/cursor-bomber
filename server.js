@@ -22,12 +22,19 @@ socket.on('connection', function (socketClient) {
     if (typeof msg.cursorPosition != "undefined") {
       player.updatePosition(msg.cursorPosition)
     }
+    if (typeof msg.setBomb != "undefined") {
+      app.setBomb(msg.setBomb)
+    }
   })
   socketClient.on("disconnect", function () {
     player.destroy()
   })
 });
 
-app.bind("playerMove", function () {
+app.bind("playerMoved", function () {
   socket.broadcast({ positions: app.getPlayersPositions() })
+})
+
+app.bind(["bombCreated", "bombUpdated", "bombDestroyed"], function () {
+  socket.broadcast({ bombs: app.getBombs() })
 })
