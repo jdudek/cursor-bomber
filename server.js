@@ -1,12 +1,12 @@
 require.paths.unshift('.');
 var http = require('http'),
     io = require('socket.io'),
-    static = require('node-static'),
+    nodeStatic = require('node-static'),
     application = require('application');
 
-var app = new application.App()
+var app = new application.App();
 
-var fileServer = new static.Server('./public');
+var fileServer = new nodeStatic.Server('./public');
 
 var server = http.createServer(function (req, res) {
   req.addListener('end', function () {
@@ -17,7 +17,7 @@ server.listen(3000);
 
 var socket = io.listen(server);
 socket.on('connection', function (socketClient) {
-  var player = app.addPlayer(socketClient)
+  var player = app.addPlayer(socketClient);
   socketClient.on('message', function (msg) {
     if (typeof msg.cursorPosition != "undefined") {
       player.updatePosition(msg.cursorPosition);
