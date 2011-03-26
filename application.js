@@ -20,20 +20,19 @@ exports.App = function () {
     }
     console.log(name);
   };
-  self.addPlayer = function (socketClient) {
+  self.addPlayer = function () {
     var index = players.length;
-    players[index] = new Player(self, index, socketClient, colorSequence.getNextColor());
+    players[index] = new Player(self, colorSequence.getNextColor());
     return players[index];
   };
-  self.destroyPlayer = function (index) {
+  self.destroyPlayer = function (player) {
+    var index = players.indexOf(player);
     players.splice(index, 1);
   };
   self.getPlayersPositions = function () {
-    var ret = [];
-    players.forEach(function (player) {
-      ret.push(player.serialize());
+    return players.map(function (player) {
+      return player.serialize();
     });
-    return ret;
   };
   self.getBombs = function () {
     return bombs.map(function (bomb) {
@@ -42,7 +41,7 @@ exports.App = function () {
   };
   self.setBomb = function (position) {
     var index = bombs.length;
-    bombs[index] = new Bomb(self, index, position);
+    bombs[index] = new Bomb(self, position);
     return bombs[index];
   };
   self.destroyBomb = function (bomb) {
@@ -51,25 +50,26 @@ exports.App = function () {
   };
 };
 
-var Player = function (app, index, socketClient, color) {
+var Player = function (app, color) {
   var self = this;
   var position = { x: 0, y: 0 };
 
   self.updatePosition = function (newPosition) {
     position.x = newPosition.x;
     position.y = newPosition.y;
-    console.log("player: " + index + " ", position);
+    // console.log("player: " + index + " ", position);
     app.trigger("playerMoved");
   };
   self.destroy = function () {
-    app.destroyPlayer(index);
+    app.destroyPlayer(self);
+    app.trigger("playerDestroyed");
   };
   self.serialize = function () {
     return { x: position.x, y: position.y, color: color };
   };
 };
 
-var Bomb = function (app, index, position) {
+var Bomb = function (app, position) {
   var self = this;
 
   self.x = position.x;

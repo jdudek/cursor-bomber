@@ -16,9 +16,9 @@ var server = http.createServer(function (req, res) {
 server.listen(3000);
 
 var socket = io.listen(server);
-socket.on('connection', function (socketClient) {
-  var player = app.addPlayer(socketClient);
-  socketClient.on('message', function (msg) {
+socket.on('connection', function (clientSocket) {
+  var player = app.addPlayer();
+  clientSocket.on('message', function (msg) {
     if (typeof msg.cursorPosition != "undefined") {
       player.updatePosition(msg.cursorPosition);
     }
@@ -26,7 +26,7 @@ socket.on('connection', function (socketClient) {
       app.setBomb(msg.setBomb);
     }
   });
-  socketClient.on("disconnect", function () {
+  clientSocket.on("disconnect", function () {
     player.destroy();
   });
 });
