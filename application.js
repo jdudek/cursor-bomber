@@ -1,6 +1,5 @@
 exports.App = function () {
   var self = this
-  var count = 0
   var players = []
 
   self.bind = function (name, fn) {
@@ -14,9 +13,13 @@ exports.App = function () {
     }
   }
   self.addPlayer = function (socketClient) {
-    var index = count++
+    var index = players.length
     players[index] = new Player(self, index, socketClient)
     return players[index]
+  }
+  self.destroyPlayer = function (index) {
+    players.splice(index, 1)
+    console.log("player: " + index + " destroyed")
   }
   self.getPlayersPositions = function () {
     var ret = []
@@ -38,8 +41,7 @@ var Player = function (app, index, socketClient) {
     app.trigger("playerMove")
   }
   self.destroy = function () {
-    app.players.splice(index, 1)
-    console.log("player: " + index + " destroyed")
+    app.destroyPlayer(index)
   }
   self.getPosition = function () {
     return cursorPosition
