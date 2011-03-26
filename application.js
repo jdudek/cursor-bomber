@@ -45,7 +45,8 @@ exports.App = function () {
     bombs[index] = new Bomb(self, index, position)
     return bombs[index]
   }
-  self.destroyBomb = function (index) {
+  self.destroyBomb = function (bomb) {
+    var index = bombs.indexOf(bomb)
     bombs.splice(index, 1)
   }
 };
@@ -89,13 +90,13 @@ var Bomb = function (app, index, position) {
   }, Bomb.STEP_TIMEOUT)
 
   self.destroy = function () {
-    app.destroyBomb(index)
+    app.destroyBomb(self)
     app.trigger("bombDestroyed")
   }
 }
 Bomb.SIZE_STEP = 1
 Bomb.STEP_TIMEOUT = 100
-Bomb.MAX_SIZE = 100
+Bomb.MAX_SIZE = 30
 
 var ColorSequence = function() {
 	var lastColor = 10

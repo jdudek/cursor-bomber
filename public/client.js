@@ -1,4 +1,4 @@
-var socket = new io.Socket("192.168.0.42"); 
+var socket = new io.Socket(location.hostname);
 socket.connect();
 socket.on('connect', function () {
   // socket.send("dupa");
